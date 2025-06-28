@@ -1,3 +1,4 @@
+# ai! we'll be using terraform workspaces, include the workspace name in resource names, such as "s3-notification-queue-$woprkspace"
 terraform {
   backend "s3" {
     bucket = "lmacguire-terraform"
