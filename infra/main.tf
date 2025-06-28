@@ -1,6 +1,8 @@
 provider "aws" {
-  region = var.aws_region
+  region = "eu-west-1"
 }
+
+# ai! Configure terraform to save its state in an s3 bucket called "lmacguire-terraform" under the key "kbank-notifications"
 
 resource "aws_sqs_queue" "s3_notification_queue" {
   name = "s3-notification-queue"
@@ -12,8 +14,8 @@ resource "aws_lambda_function" "email_notifications_lambda" {
   role          = aws_iam_role.lambda_execution_role.arn
   runtime       = "python3.9"
 
-  filename         = "../kbank_email_notifications_lambda.zip"
-  source_code_hash = filebase64sha256("../kbank_email_notifications_lambda.zip")
+  filename         = "../artifact.zip"
+  source_code_hash = filebase64sha256("../artifact.zip")
 }
 
 resource "aws_lambda_event_source_mapping" "sqs_lambda_trigger" {
