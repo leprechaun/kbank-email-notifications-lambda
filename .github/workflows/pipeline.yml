@@ -16,7 +16,6 @@ jobs:
         python-version: '3.9'
     - name: Install poetry
       run: |
-        install --upgrade pip
         pip install poetry
 
     - name: Install dependencies
