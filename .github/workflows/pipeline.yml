@@ -54,4 +54,5 @@ jobs:
       working-directory: infra
       run: |
         terraform init
+        terraform workspace select -or-create dev
         terraform apply -auto-approve
