@@ -79,6 +79,8 @@ resource "aws_iam_role_policy" "lambda_sqs_publish_policy" {
   })
 }
 
+# ai! Add permissions to s3 to the Lambda execution role
+
 resource "aws_iam_role_policy_attachment" "lambda_sqs_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
   role       = aws_iam_role.lambda_execution_role.name
