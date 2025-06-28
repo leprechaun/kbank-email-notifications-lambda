@@ -79,7 +79,26 @@ resource "aws_iam_role_policy" "lambda_sqs_publish_policy" {
   })
 }
 
-# ai! Add permissions to s3 to the Lambda execution role
+resource "aws_iam_role_policy" "lambda_s3_read_policy" {
+  name = "lambda-s3-read-policy-${terraform.workspace}"
+  role = aws_iam_role.lambda_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::*"  # Adjust this to be more restrictive if possible
+        ]
+      }
+    ]
+  })
+}
 
 resource "aws_iam_role_policy_attachment" "lambda_sqs_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
