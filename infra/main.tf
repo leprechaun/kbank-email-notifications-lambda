@@ -1,4 +1,3 @@
-# ai! we'll be using terraform workspaces, include the workspace name in resource names, such as "s3-notification-queue-$woprkspace"
 terraform {
   backend "s3" {
     bucket = "lmacguire-terraform"
@@ -12,11 +11,11 @@ provider "aws" {
 }
 
 resource "aws_sqs_queue" "s3_notification_queue" {
-  name = "s3-notification-queue"
+  name = "s3-notification-queue-${terraform.workspace}"
 }
 
 resource "aws_lambda_function" "email_notifications_lambda" {
-  function_name = "kbank-email-notifications"
+  function_name = "kbank-email-notifications-${terraform.workspace}"
   handler       = "hello_world.handler"
   role          = aws_iam_role.lambda_execution_role.arn
   runtime       = "python3.9"
@@ -32,7 +31,7 @@ resource "aws_lambda_event_source_mapping" "sqs_lambda_trigger" {
 }
 
 resource "aws_iam_role" "lambda_execution_role" {
-  name = "kbank-lambda-sqs-role"
+  name = "kbank-lambda-sqs-role-${terraform.workspace}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
