@@ -19,7 +19,7 @@ def handler(event, context):
     try:
         # Log the entire incoming event for debugging
         logger.info(f"Received event: {json.dumps(event)}")
-        logger.info(json.dumps(context))
+        print(context)
 
         # Process SQS records
         content_length = "unknown"
