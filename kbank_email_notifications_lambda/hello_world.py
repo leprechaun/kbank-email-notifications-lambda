@@ -9,6 +9,8 @@ logger.setLevel(logging.INFO)
 def get_object(bucket: str, key: str):
     s3 = boto3.client("s3", region_name="eu-west-1")
 
+    logger.info("Going to GET %s/%s" % (bucket, key))
+
     response = s3.get_object(Bucket=bucket, Key=key)
 
     return response['Body'].read().decode("utf-8")
@@ -17,6 +19,7 @@ def handler(event, context):
     try:
         # Log the entire incoming event for debugging
         logger.info(f"Received event: {json.dumps(event)}")
+        logger.info(json.dumps(context))
 
         # Process SQS records
         content_length = "unknown"
