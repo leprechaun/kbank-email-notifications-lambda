@@ -51,3 +51,5 @@ resource "aws_iam_role_policy_attachment" "lambda_sqs_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
   role       = aws_iam_role.lambda_execution_role.name
 }
+
+# ai! Add an SQS queue resource, and allow the lambda function to publish messages to it
