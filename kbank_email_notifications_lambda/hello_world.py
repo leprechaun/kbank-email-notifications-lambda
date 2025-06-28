@@ -2,6 +2,9 @@ import json
 import logging
 import boto3
 from urllib.parse import unquote
+from parser import Parser, TransactionFactory
+
+import email
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -30,7 +33,18 @@ def handler(event, context):
             object_contents = get_object(bucket, unquote(key))
             content_length = len(object_contents)
 
-            print(object_contents)
+            message = email.message_from_string(object_contents)
+
+            logger.debug("from: %s" % message['from'])
+            logger.debug("subject: %s" % message['subject'])
+
+            body = message.get_payload()
+
+            parser = Parser(TransactionFactory())
+
+            transaction = parser.parse(body)
+
+            print(transaction)
 
 
         # Publish a message to the SQS queue
