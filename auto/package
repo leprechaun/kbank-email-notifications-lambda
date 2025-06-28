@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+poetry run pip install --upgrade -t package dist/*.whl
+
 cd package || exit 1
 zip -r ../artifact.zip . -x '*.pyc'
 cd ../
