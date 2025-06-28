@@ -93,7 +93,8 @@ resource "aws_iam_role_policy" "lambda_s3_read_policy" {
           "s3:ListBucket"
         ]
         Resource = [
-          "arn:aws:s3:::*"  # Adjust this to be more restrictive if possible
+          "arn:aws:s3:::lmacguire-ses-incoming",
+          "arn:aws:s3:::lmacguire-ses-incoming/*"
         ]
       }
     ]
