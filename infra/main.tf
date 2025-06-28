@@ -1,8 +1,14 @@
+terraform {
+  backend "s3" {
+    bucket = "lmacguire-terraform"
+    key    = "kbank-notifications"
+    region = "eu-west-1"
+  }
+}
+
 provider "aws" {
   region = "eu-west-1"
 }
-
-# ai! Configure terraform to save its state in an s3 bucket called "lmacguire-terraform" under the key "kbank-notifications"
 
 resource "aws_sqs_queue" "s3_notification_queue" {
   name = "s3-notification-queue"
