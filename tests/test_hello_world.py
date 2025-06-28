@@ -3,6 +3,7 @@ import pytest
 import boto3
 from moto import mock_aws
 from kbank_email_notifications_lambda.hello_world import handler, get_object
+from urllib.parse import unquote
 
 @mock_aws
 def test_handler_successful_processing():
@@ -12,6 +13,17 @@ def test_handler_successful_processing():
     # Create a mock SQS queue
     sqs_client = boto3.client('sqs', region_name='eu-west-1')
     queue_url = sqs_client.create_queue(QueueName='email-notification-queue-dev')['QueueUrl']
+
+    s3_client = boto3.client('s3', region_name='eu-west-1')
+    bucket_name = 'my-example-bucket'
+    object_key = unquote("some-folder/username%40domain.com/random-hex-characters")
+
+    # Create a mock bucket and object
+    s3_client.create_bucket(
+        Bucket=bucket_name,
+        CreateBucketConfiguration={'LocationConstraint': 'eu-west-1'}
+    )
+    s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=b'test content')
 
     mock_event = {
       "Records": [

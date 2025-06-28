@@ -1,6 +1,7 @@
 import json
 import logging
 import boto3
+from urllib.parse import unquote
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -18,12 +19,14 @@ def handler(event, context):
         logger.info(f"Received event: {json.dumps(event)}")
 
         # Process SQS records
+        content_length = "unknown"
         for record in event.get('Records', []):
-            # Parse SQS message body
-            sqs_body = json.loads(record.get('body', '{}'))
+            bucket = record['s3']['bucket']['name']
+            key = record['s3']['object']['key']
 
-            # Log SQS message details
-            logger.info(f"SQS Message Body: {json.dumps(sqs_body)}")
+            object_contents = get_object(bucket, unquote(key))
+            content_length = len(object_contents)
+
 
         # Publish a message to the SQS queue
         sqs_client = boto3.client('sqs', region_name="eu-west-1")
@@ -32,7 +35,8 @@ def handler(event, context):
         message = {
             'subject': 'S3 Notification Processed',
             'body': 'Successfully processed S3 notification',
-            'timestamp': json.dumps(event)
+            'timestamp': json.dumps(event),
+            "content_length": content_length
         }
 
         sqs_client.send_message(
