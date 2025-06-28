@@ -27,6 +27,8 @@ def handler(event, context):
             # Log SQS message details
             logger.info(f"SQS Message Body: {json.dumps(sqs_body)}")
 
+        # ai! Publish a message to the SQS queue "https://sqs.eu-west-1.amazonaws.com/307985306317/email-notification-queue-dev"
+
         return {
             'statusCode': 200,
             'body': json.dumps({
