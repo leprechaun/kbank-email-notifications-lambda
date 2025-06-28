@@ -29,10 +29,10 @@ resource "aws_lambda_function" "email_notifications_lambda" {
 
   environment {
     variables = {
-      EMAIL_NOTIFICATION_QUEUE_NAME = aws_sqs_queue.email_notification_queue.name
-      S3_NOTIFICATION_QUEUE_NAME    = aws_sqs_queue.s3_notification_queue.name
-      LOG_LEVEL                     = "INFO"
-      ENVIRONMENT                   = terraform.workspace
+      EMAIL_NOTIFICATION_QUEUE_URL = aws_sqs_queue.email_notification_queue.url
+      S3_NOTIFICATION_QUEUE_URL    = aws_sqs_queue.s3_notification_queue.url
+      LOG_LEVEL                    = "INFO"
+      ENVIRONMENT                  = terraform.workspace
     }
   }
 }
