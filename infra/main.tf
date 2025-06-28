@@ -14,6 +14,10 @@ resource "aws_sqs_queue" "s3_notification_queue" {
   name = "s3-notification-queue-${terraform.workspace}"
 }
 
+resource "aws_sqs_queue" "email_notification_queue" {
+  name = "email-notification-queue-${terraform.workspace}"
+}
+
 resource "aws_lambda_function" "email_notifications_lambda" {
   function_name = "kbank-email-notifications-${terraform.workspace}"
   handler       = "kbank_email_notifications_lambda.hello_world.handler"
@@ -47,9 +51,26 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 }
 
+resource "aws_iam_role_policy" "lambda_sqs_publish_policy" {
+  name = "lambda-sqs-publish-policy-${terraform.workspace}"
+  role = aws_iam_role.lambda_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage",
+          "sqs:SendMessageBatch"
+        ]
+        Resource = aws_sqs_queue.email_notification_queue.arn
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_sqs_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
   role       = aws_iam_role.lambda_execution_role.name
 }
-
-# ai! Add an SQS queue resource, and allow the lambda function to publish messages to it
