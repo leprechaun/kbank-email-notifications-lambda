@@ -16,7 +16,7 @@ resource "aws_sqs_queue" "s3_notification_queue" {
 
 resource "aws_lambda_function" "email_notifications_lambda" {
   function_name = "kbank-email-notifications-${terraform.workspace}"
-  handler       = "hello_world.handler"
+  handler       = "kbank_email_notifications_lambda.hello_world.handler"
   role          = aws_iam_role.lambda_execution_role.arn
   runtime       = "python3.9"
 
