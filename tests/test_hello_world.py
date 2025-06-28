@@ -85,3 +85,7 @@ def test_handler_invalid_json():
     assert response['statusCode'] == 500
     body = json.loads(response['body'])
     assert 'Failed to process S3 notification' in body['error']
+
+@mock_aws
+def test_get_object():
+    # ai! ensure the get_object method from the hello world module does a get_object on the s3 client
