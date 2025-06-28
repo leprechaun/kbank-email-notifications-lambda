@@ -18,6 +18,7 @@ resource "aws_sqs_queue" "email_notification_queue" {
   name = "email-notification-queue-${terraform.workspace}"
 }
 
+# ai! set the timeout for the function to 10 seconds
 resource "aws_lambda_function" "email_notifications_lambda" {
   function_name = "kbank-email-notifications-${terraform.workspace}"
   handler       = "kbank_email_notifications_lambda.hello_world.handler"
