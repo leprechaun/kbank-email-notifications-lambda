@@ -26,6 +26,15 @@ resource "aws_lambda_function" "email_notifications_lambda" {
 
   filename         = "../artifact.zip"
   source_code_hash = filebase64sha256("../artifact.zip")
+
+  environment {
+    variables = {
+      EMAIL_NOTIFICATION_QUEUE_NAME = aws_sqs_queue.email_notification_queue.name
+      S3_NOTIFICATION_QUEUE_NAME    = aws_sqs_queue.s3_notification_queue.name
+      LOG_LEVEL                     = "INFO"
+      ENVIRONMENT                   = terraform.workspace
+    }
+  }
 }
 
 resource "aws_lambda_event_source_mapping" "sqs_lambda_trigger" {
