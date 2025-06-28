@@ -30,6 +30,8 @@ def handler(event, context):
             object_contents = get_object(bucket, unquote(key))
             content_length = len(object_contents)
 
+            print(object_contents)
+
 
         # Publish a message to the SQS queue
         sqs_client = boto3.client('sqs', region_name="eu-west-1")
