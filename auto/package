@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+cd package || exit 1
+zip -r ../artifact.zip . -x '*.pyc'
+cd ../
