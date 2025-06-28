@@ -14,24 +14,42 @@ def test_handler_successful_processing():
     queue_url = sqs_client.create_queue(QueueName='email-notification-queue-dev')['QueueUrl']
 
     mock_event = {
-        'Records': [
-            {
-                'body': json.dumps({
-                    's3': {
-                        'bucket': {'name': 'test-bucket'},
-                        'object': {'key': 'test-key'}
-                    }
-                })
+      "Records": [
+        {
+          "eventVersion": "2.1",
+          "eventSource": "aws:s3",
+          "awsRegion": "eu-west-1",
+          "eventTime": "2025-06-15T11:33:25.025Z",
+          "eventName": "ObjectCreated:Put",
+          "userIdentity": {
+            "principalId": "AWS:REDACTED:REDACTEDdb044b3ed29"
+          },
+          "requestParameters": {
+            "sourceIPAddress": "10.0.28.239"
+          },
+          "responseElements": {
+            "x-amz-request-id": "randomish-string",
+            "x-amz-id-2": "randomish-string-two"
+          },
+          "s3": {
+            "s3SchemaVersion": "1.0",
+            "configurationId": "some-configuration-id",
+            "bucket": {
+              "name": "my-example-bucket",
+              "ownerIdentity": {
+                "principalId": "some-principal-id"
+              },
+              "arn": "arn:aws:s3:::my-example-bucket"
             },
-            {
-                'body': json.dumps({
-                    's3': {
-                        'bucket': {'name': 'another-bucket'},
-                        'object': {'key': 'another-key'}
-                    }
-                })
+            "object": {
+              "key": "some-folder/username%40domain.com/random-hex-characters",
+              "size": 12086,
+              "eTag": "lkajsdlkjasdlkajsd",
+              "sequencer": "lksjefopuiw23rokjsdf"
             }
-        ]
+          }
+        }
+      ]
     }
 
     response = handler(mock_event, None)
@@ -43,7 +61,7 @@ def test_handler_successful_processing():
 
     assert response['statusCode'] == 200
     body = json.loads(response['body'])
-    assert body['recordsProcessed'] == 2
+    assert body['recordsProcessed'] == 1
     assert body['message'] == 'Successfully processed S3 notification from SQS'
 
 @mock_aws
@@ -92,16 +110,16 @@ def test_get_object():
     s3_client = boto3.client('s3', region_name='eu-west-1')
     bucket_name = 'test-bucket'
     object_key = 'test-key'
-    
+
     # Create a mock bucket and object
     s3_client.create_bucket(
         Bucket=bucket_name, 
         CreateBucketConfiguration={'LocationConstraint': 'eu-west-1'}
     )
     s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=b'test content')
-    
+
     # Call get_object and verify it uses S3 client's get_object method
     result = get_object(bucket_name, object_key)
-    
+
     # Assert that the result matches the object we put
-    assert result['Body'].read() == b'test content'
+    assert result == 'test content'
