@@ -1,5 +1,6 @@
 import json
 import logging
+import boto3
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -27,7 +28,20 @@ def handler(event, context):
             # Log SQS message details
             logger.info(f"SQS Message Body: {json.dumps(sqs_body)}")
 
-        # ai! Publish a message to the SQS queue "https://sqs.eu-west-1.amazonaws.com/307985306317/email-notification-queue-dev"
+        # Publish a message to the SQS queue
+        sqs_client = boto3.client('sqs')
+        queue_url = 'https://sqs.eu-west-1.amazonaws.com/307985306317/email-notification-queue-dev'
+        
+        message = {
+            'subject': 'S3 Notification Processed',
+            'body': 'Successfully processed S3 notification',
+            'timestamp': json.dumps(event)
+        }
+        
+        sqs_client.send_message(
+            QueueUrl=queue_url,
+            MessageBody=json.dumps(message)
+        )
 
         return {
             'statusCode': 200,
