@@ -1,7 +1,9 @@
 import json
 import pytest
+import moto
 from kbank_email_notifications_lambda.hello_world import handler
 
+# ai! using moto, mopck out all calls to SQS
 def test_handler_successful_processing():
     """
     Test the Lambda handler with a mock SQS event containing records.
