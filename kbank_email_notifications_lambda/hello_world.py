@@ -29,7 +29,7 @@ def handler(event, context):
             logger.info(f"SQS Message Body: {json.dumps(sqs_body)}")
 
         # Publish a message to the SQS queue
-        sqs_client = boto3.client('sqs')
+        sqs_client = boto3.client('sqs', region_name="eu-west-1")
         queue_url = 'https://sqs.eu-west-1.amazonaws.com/307985306317/email-notification-queue-dev'
         
         message = {
