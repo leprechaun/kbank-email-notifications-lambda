@@ -2,7 +2,7 @@ import json
 import pytest
 import boto3
 from moto import mock_aws
-from kbank_email_notifications_lambda.hello_world import handler
+from kbank_email_notifications_lambda.hello_world import handler, get_object
 
 @mock_aws
 def test_handler_successful_processing():
@@ -88,4 +88,20 @@ def test_handler_invalid_json():
 
 @mock_aws
 def test_get_object():
-    # ai! ensure the get_object method from the hello world module does a get_object on the s3 client
+    # Create a mock S3 client and bucket
+    s3_client = boto3.client('s3', region_name='eu-west-1')
+    bucket_name = 'test-bucket'
+    object_key = 'test-key'
+    
+    # Create a mock bucket and object
+    s3_client.create_bucket(
+        Bucket=bucket_name, 
+        CreateBucketConfiguration={'LocationConstraint': 'eu-west-1'}
+    )
+    s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=b'test content')
+    
+    # Call get_object and verify it uses S3 client's get_object method
+    result = get_object(bucket_name, object_key)
+    
+    # Assert that the result matches the object we put
+    assert result['Body'].read() == b'test content'
