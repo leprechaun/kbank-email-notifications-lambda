@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     bucket = "lmacguire-terraform"
     key    = "kbank-notifications"
-    region = "eu-west-1"
+    region = "ap-southeast-1"
   }
 }
 
