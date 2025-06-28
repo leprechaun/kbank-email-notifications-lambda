@@ -45,7 +45,7 @@ jobs:
         poetry install --no-root
     - name: Build
       run: |
-        poetry build --config-settings local-version=0.1.{{ github.run_number }}
+        poetry build --config-settings local-version=0.1.${{ github.run_number }}
     - name: Package
       run: |
         ./auto/package
