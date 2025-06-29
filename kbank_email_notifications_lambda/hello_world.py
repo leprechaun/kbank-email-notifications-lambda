@@ -1,6 +1,7 @@
 import logging
 import os
 import boto3
+import json
 
 from kbank_email_notifications_lambda.parser import Parser, TransactionFactory
 from kbank_email_notifications_lambda.processor import TransactionNotificationEmailProcessor
@@ -38,4 +39,8 @@ def handler(event, context):
         logger
     )
 
-    TNP.handle(event, context)
+    logger.info("SQS Event has %s records" % str(len(event['Records'])))
+
+    for record in event['Records']:
+        body = json.loads(record['body'])
+        TNP.handle(body, context)
