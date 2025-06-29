@@ -3,17 +3,66 @@ import pytest
 import boto3
 from unittest.mock import MagicMock
 from moto import mock_aws
-#from kbank_email_notifications_lambda.hello_world import handler, get_object, process_record
+from kbank_email_notifications_lambda.parser import Transaction, Recipient
 import kbank_email_notifications_lambda.hello_world as hw
 from urllib.parse import unquote
+from datetime import datetime
+
+example_record = {
+  "eventVersion": "2.1",
+  "eventSource": "aws:s3",
+  "awsRegion": "eu-west-1",
+  "eventTime": "2025-06-15T11:33:25.025Z",
+  "eventName": "ObjectCreated:Put",
+  "userIdentity": {
+    "principalId": "AWS:REDACTED:REDACTEDdb044b3ed29"
+  },
+  "requestParameters": {
+    "sourceIPAddress": "10.0.28.239"
+  },
+  "responseElements": {
+    "x-amz-request-id": "randomish-string",
+    "x-amz-id-2": "randomish-string-two"
+  },
+  "s3": {
+    "s3SchemaVersion": "1.0",
+    "configurationId": "some-configuration-id",
+    "bucket": {
+      "name": "my-example-bucket",
+      "ownerIdentity": {
+        "principalId": "some-principal-id"
+      },
+      "arn": "arn:aws:s3:::my-example-bucket"
+    },
+    "object": {
+      "key": "some-folder/username%40domain.com/random-hex-characters",
+      "size": 12086,
+      "eTag": "lkajsdlkjasdlkajsd",
+      "sequencer": "lksjefopuiw23rokjsdf"
+    }
+  }
+}
 
 @mock_aws
 def test_handler_successful_processing():
     """
     Test the Lambda handler with a mock SQS event containing records.
     """
-    hw.process_record = MagicMock(return_value=True)
+    t = Transaction(
+        datetime.now(),
+        "trololo-id-xyz",
+        123.45,
+        "source-account",
+        Recipient(
+            "Some Bank",
+            "123-4567-89",
+            "Recipient Name"
+        ),
+        0,
+        1_234_567.89
+    )
 
+    hw.process_record = MagicMock(return_value=t)
 
     # Create a mock SQS queue
     sqs_client = boto3.client('sqs', region_name='eu-west-1')
@@ -28,44 +77,16 @@ def test_handler_successful_processing():
         Bucket=bucket_name,
         CreateBucketConfiguration={'LocationConstraint': 'eu-west-1'}
     )
-    s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=b'test content')
+
+    s3_client.put_object(
+        Bucket=bucket_name,
+        Key=object_key,
+        Body=b'test content'
+    )
 
     mock_event = {
       "Records": [
-        {
-          "eventVersion": "2.1",
-          "eventSource": "aws:s3",
-          "awsRegion": "eu-west-1",
-          "eventTime": "2025-06-15T11:33:25.025Z",
-          "eventName": "ObjectCreated:Put",
-          "userIdentity": {
-            "principalId": "AWS:REDACTED:REDACTEDdb044b3ed29"
-          },
-          "requestParameters": {
-            "sourceIPAddress": "10.0.28.239"
-          },
-          "responseElements": {
-            "x-amz-request-id": "randomish-string",
-            "x-amz-id-2": "randomish-string-two"
-          },
-          "s3": {
-            "s3SchemaVersion": "1.0",
-            "configurationId": "some-configuration-id",
-            "bucket": {
-              "name": "my-example-bucket",
-              "ownerIdentity": {
-                "principalId": "some-principal-id"
-              },
-              "arn": "arn:aws:s3:::my-example-bucket"
-            },
-            "object": {
-              "key": "some-folder/username%40domain.com/random-hex-characters",
-              "size": 12086,
-              "eTag": "lkajsdlkjasdlkajsd",
-              "sequencer": "lksjefopuiw23rokjsdf"
-            }
-          }
-        }
+        example_record
       ]
     }
 

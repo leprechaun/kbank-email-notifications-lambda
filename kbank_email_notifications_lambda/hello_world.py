@@ -3,6 +3,8 @@ import logging
 import boto3
 from urllib.parse import unquote
 from kbank_email_notifications_lambda.parser import Parser, TransactionFactory
+from dataclasses import asdict
+import json
 
 import email
 
@@ -50,6 +52,8 @@ def handler(event, context):
         content_length = "unknown"
         for record in event.get('Records', []):
             transaction = process_record(record)
+
+            logger.info("Will publish: %s" % json.dumps(asdict(transaction), default=str))
 
 
         # Publish a message to the SQS queue
