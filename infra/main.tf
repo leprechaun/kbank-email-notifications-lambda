@@ -14,9 +14,8 @@ resource "aws_sqs_queue" "s3_notification_queue" {
   name = "kbank-parsed-notifications-${terraform.workspace}"
 }
 
-# ai! rename this queue to "incoming-ses-notifications
 resource "aws_sqs_queue" "email_notification_queue" {
-  name = "email-notification-queue-${terraform.workspace}"
+  name = "incoming-ses-notifications-${terraform.workspace}"
 }
 
 resource "aws_lambda_function" "email_notifications_lambda" {
