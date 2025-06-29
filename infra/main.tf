@@ -10,7 +10,7 @@ provider "aws" {
   region = "eu-west-1"
 }
 
-resource "aws_sqs_queue" "s3_notification_queue" {
+resource "aws_sqs_queue" "parsed_transaction_queue" {
   name = "kbank-parsed-notifications-${terraform.workspace}"
 }
 
@@ -30,8 +30,7 @@ resource "aws_lambda_function" "email_notifications_lambda" {
 
   environment {
     variables = {
-      EMAIL_NOTIFICATION_QUEUE_URL = aws_sqs_queue.email_notification_queue.url
-      S3_NOTIFICATION_QUEUE_URL    = aws_sqs_queue.s3_notification_queue.url
+      PARSED_TRANSACTION_QUEUE_URL    = aws_sqs_queue.parsed_transaction_queue.url
       LOG_LEVEL                    = "INFO"
       ENVIRONMENT                  = terraform.workspace
     }
@@ -39,7 +38,7 @@ resource "aws_lambda_function" "email_notifications_lambda" {
 }
 
 resource "aws_lambda_event_source_mapping" "sqs_lambda_trigger" {
-  event_source_arn = aws_sqs_queue.s3_notification_queue.arn
+  event_source_arn = aws_sqs_queue.parsed_transaction_queue.arn
   function_name    = aws_lambda_function.email_notifications_lambda.arn
   batch_size       = 10
 }

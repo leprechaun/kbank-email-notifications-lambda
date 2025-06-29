@@ -3,10 +3,14 @@ import pytest
 import boto3
 from unittest.mock import MagicMock
 from moto import mock_aws
-from kbank_email_notifications_lambda.parser import Transaction, Recipient
+from kbank_email_notifications_lambda.parser import Transaction, Recipient, Parser, TransactionFactory
 import kbank_email_notifications_lambda.hello_world as hw
 from urllib.parse import unquote
 from datetime import datetime
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 example_record = {
   "eventVersion": "2.1",
@@ -62,15 +66,17 @@ def test_handler_successful_processing():
         1_234_567.89
     )
 
-    hw.process_record = MagicMock(return_value=t)
 
     # Create a mock SQS queue
     sqs_client = boto3.client('sqs', region_name='eu-west-1')
-    queue_url = sqs_client.create_queue(QueueName='email-notification-queue-dev')['QueueUrl']
+    destination_queue_url = sqs_client.create_queue(QueueName='email-notification-queue-dev')['QueueUrl']
 
     s3_client = boto3.client('s3', region_name='eu-west-1')
     bucket_name = 'my-example-bucket'
     object_key = unquote("some-folder/username%40domain.com/random-hex-characters")
+
+
+
 
     # Create a mock bucket and object
     s3_client.create_bucket(
@@ -90,50 +96,30 @@ def test_handler_successful_processing():
       ]
     }
 
-    response = hw.handler(mock_event, None)
+    parser = Parser(TransactionFactory())
+
+    TNP = hw.TransactionNotificationEmailProcessor(
+        parser,
+        sqs_client,
+        destination_queue_url,
+        s3_client,
+        logger
+    )
+
+    TNP.process_record = MagicMock(return_value=t)
+
+    response = TNP.handle(mock_event, {})
 
     # Verify SQS message was sent
-    messages = sqs_client.receive_message(QueueUrl=queue_url)
+    messages = sqs_client.receive_message(
+        QueueUrl=destination_queue_url
+    )
+
+    logger.info(messages)
+
     assert 'Messages' in messages
 
     assert response['statusCode'] == 200
     body = json.loads(response['body'])
     assert body['recordsProcessed'] == 1
     assert body['message'] == 'Successfully processed S3 notification from SQS'
-
-@mock_aws
-def test_handler_empty_event():
-    """
-    Test the Lambda handler with an empty event.
-    """
-    # Create a mock SQS queue
-    sqs_client = boto3.client('sqs', region_name='eu-west-1')
-    sqs_client.create_queue(QueueName='email-notification-queue-dev')
-
-    mock_event = {}
-
-    response = hw.handler(mock_event, None)
-
-    assert response['statusCode'] == 200
-    body = json.loads(response['body'])
-    assert body['recordsProcessed'] == 0
-
-@mock_aws
-def test_get_object():
-    # Create a mock S3 client and bucket
-    s3_client = boto3.client('s3', region_name='eu-west-1')
-    bucket_name = 'test-bucket'
-    object_key = 'test-key'
-
-    # Create a mock bucket and object
-    s3_client.create_bucket(
-        Bucket=bucket_name, 
-        CreateBucketConfiguration={'LocationConstraint': 'eu-west-1'}
-    )
-    s3_client.put_object(Bucket=bucket_name, Key=object_key, Body=b'test content')
-
-    # Call get_object and verify it uses S3 client's get_object method
-    result = hw.get_object(bucket_name, object_key)
-
-    # Assert that the result matches the object we put
-    assert result == 'test content'

@@ -1,91 +1,38 @@
-import json
 import logging
+import os
 import boto3
-from urllib.parse import unquote
-from kbank_email_notifications_lambda.parser import Parser, TransactionFactory
-from dataclasses import asdict
-import json
 
-import email
+from kbank_email_notifications_lambda.parser import Parser, TransactionFactory
+from kbank_email_notifications_lambda.processor import TransactionNotificationEmailProcessor
+
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-def get_object(bucket: str, key: str):
-    s3 = boto3.client("s3", region_name="eu-west-1")
 
-    logger.info("Going to GET %s/%s" % (bucket, key))
+def handler(event, context):
+    aws_region = event.get("awsRegion")
 
-    response = s3.get_object(Bucket=bucket, Key=key)
+    if aws_region is None:
+        logger.fatal("Event didn't include awsRegion")
+        return False
 
-    return response['Body'].read().decode("utf-8")
+    sqs_client = boto3.client('sqs', region_name=aws_region)
+    s3_client = boto3.client('s3', region_name=aws_region)
 
-def process_record(record):
-    bucket = record['s3']['bucket']['name']
-    key = record['s3']['object']['key']
-
-    object_contents = get_object(bucket, unquote(key))
-    content_length = len(object_contents)
-
-    message = email.message_from_string(object_contents)
-
-    logger.debug("from: %s" % message['from'])
-    logger.debug("subject: %s" % message['subject'])
-
-    body = message.get_payload()
+    destination_queue = os.environ.get("PARSED_TRANSACTION_QUEUE_URL")
+    if destination_queue is None:
+        logger.fatal("Destination queue is undefined")
+        return False
 
     parser = Parser(TransactionFactory())
 
-    transaction = parser.parse(body)
+    TNP = TransactionNotificationEmailProcessor(
+        parser,
+        sqs_client,
+        destination_queue,
+        s3_client,
+        logger
+    )
 
-    print(transaction)
-
-    return transaction
-
-def handler(event, context):
-    try:
-        # Log the entire incoming event for debugging
-        logger.info(f"Received event: {json.dumps(event)}")
-        print(context)
-
-        # Process SQS records
-        content_length = "unknown"
-        for record in event.get('Records', []):
-            transaction = process_record(record)
-
-            logger.info("Will publish: %s" % json.dumps(asdict(transaction), default=str))
-
-
-        # Publish a message to the SQS queue
-        sqs_client = boto3.client('sqs', region_name="eu-west-1")
-        queue_url = 'https://sqs.eu-west-1.amazonaws.com/307985306317/email-notification-queue-dev'
-
-        message = {
-            'subject': 'S3 Notification Processed',
-            'body': 'Successfully processed S3 notification',
-            'timestamp': json.dumps(event),
-            "content_length": content_length
-        }
-
-        sqs_client.send_message(
-            QueueUrl=queue_url,
-            MessageBody=json.dumps(message)
-        )
-
-        return {
-            'statusCode': 200,
-            'body': json.dumps({
-                'message': 'Successfully processed S3 notification from SQS',
-                'recordsProcessed': len(event.get('Records', []))
-            })
-        }
-
-    except Exception as e:
-        logger.error(f"Error processing event: {str(e)}")
-        return {
-            'statusCode': 500,
-            'body': json.dumps({
-                'error': 'Failed to process S3 notification',
-                'details': str(e)
-            })
-        }
+    TNP.handle(event, context)
