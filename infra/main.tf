@@ -15,7 +15,7 @@ resource "aws_sqs_queue" "parsed_transaction_queue" {
 }
 
 resource "aws_sqs_queue" "email_notification_queue" {
-  name = "incoming-ses-notifications-${terraform.workspace}"
+  name = "ses-incoming-notifications-${terraform.workspace}"
 }
 
 resource "aws_lambda_function" "email_notifications_lambda" {
