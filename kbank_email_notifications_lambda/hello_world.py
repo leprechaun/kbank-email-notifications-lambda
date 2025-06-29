@@ -11,8 +11,7 @@ logger.setLevel(logging.INFO)
 
 
 def handler(event, context):
-    aws_region = event.get("awsRegion")
-
+    aws_region = "eu-west-1"
     logger.info(event)
 
     if aws_region is None:
