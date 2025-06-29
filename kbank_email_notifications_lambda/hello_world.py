@@ -27,6 +27,8 @@ def handler(event, context):
 
     parser = Parser(TransactionFactory())
 
+    logger.info("region=" + aws_region + ", queue=" + destination_queue)
+
     TNP = TransactionNotificationEmailProcessor(
         parser,
         sqs_client,
