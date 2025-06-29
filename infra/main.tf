@@ -6,6 +6,12 @@ terraform {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
+locals {
+    account_id = data.aws_caller_identity.current.account_id
+}
+
 provider "aws" {
   region = "eu-west-1"
 }
@@ -109,4 +115,36 @@ resource "aws_iam_role_policy" "lambda_s3_read_policy" {
 resource "aws_iam_role_policy_attachment" "lambda_sqs_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
   role       = aws_iam_role.lambda_execution_role.name
+}
+
+
+data "aws_iam_policy_document" "incoming_email_notification_queue_policy_document" {
+  statement {
+    sid       = "first"
+    effect    = "Allow"
+    resources = [aws_sqs_queue.incoming_email_notification_queue.arn]
+    actions   = ["SQS:SendMessage"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [local.account_id]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:s3:*:*:lmacguire-ses-incoming"]
+    }
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "incoming_email_notification_queue_policy" {
+  queue_url = aws_sqs_queue.incoming_email_notification_queue.id
+  policy    = data.aws_iam_policy_document.incoming_email_notification_queue_policy_document.json
 }
