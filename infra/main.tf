@@ -10,6 +10,7 @@ provider "aws" {
   region = "eu-west-1"
 }
 
+# ai! rename this queue to "kbank-parsed-notifications"
 resource "aws_sqs_queue" "s3_notification_queue" {
   name = "s3-notification-queue-${terraform.workspace}"
 }
