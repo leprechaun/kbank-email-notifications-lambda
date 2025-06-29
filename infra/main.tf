@@ -84,7 +84,7 @@ resource "aws_iam_role_policy" "lambda_sqs_publish_policy" {
           "sqs:SendMessage",
           "sqs:SendMessageBatch"
         ]
-        Resource = aws_sqs_queue.incoming_email_notification_queue.arn
+        Resource = aws_sqs_queue.parsed_transaction_queue.arn
       }
     ]
   })
