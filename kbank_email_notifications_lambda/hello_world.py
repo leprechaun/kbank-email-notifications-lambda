@@ -2,7 +2,7 @@ import json
 import logging
 import boto3
 from urllib.parse import unquote
-from parser import Parser, TransactionFactory
+from kbank_email_notifications_lambda.parser import Parser, TransactionFactory
 
 import email
 
@@ -18,6 +18,28 @@ def get_object(bucket: str, key: str):
 
     return response['Body'].read().decode("utf-8")
 
+def process_record(record):
+    bucket = record['s3']['bucket']['name']
+    key = record['s3']['object']['key']
+
+    object_contents = get_object(bucket, unquote(key))
+    content_length = len(object_contents)
+
+    message = email.message_from_string(object_contents)
+
+    logger.debug("from: %s" % message['from'])
+    logger.debug("subject: %s" % message['subject'])
+
+    body = message.get_payload()
+
+    parser = Parser(TransactionFactory())
+
+    transaction = parser.parse(body)
+
+    print(transaction)
+
+    return transaction
+
 def handler(event, context):
     try:
         # Log the entire incoming event for debugging
@@ -27,24 +49,7 @@ def handler(event, context):
         # Process SQS records
         content_length = "unknown"
         for record in event.get('Records', []):
-            bucket = record['s3']['bucket']['name']
-            key = record['s3']['object']['key']
-
-            object_contents = get_object(bucket, unquote(key))
-            content_length = len(object_contents)
-
-            message = email.message_from_string(object_contents)
-
-            logger.debug("from: %s" % message['from'])
-            logger.debug("subject: %s" % message['subject'])
-
-            body = message.get_payload()
-
-            parser = Parser(TransactionFactory())
-
-            transaction = parser.parse(body)
-
-            print(transaction)
+            transaction = process_record(record)
 
 
         # Publish a message to the SQS queue
