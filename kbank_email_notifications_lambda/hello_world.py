@@ -13,6 +13,8 @@ logger.setLevel(logging.INFO)
 def handler(event, context):
     aws_region = event.get("awsRegion")
 
+    logger.info(event)
+
     if aws_region is None:
         logger.fatal("Event didn't include awsRegion")
         return False
