@@ -44,9 +44,11 @@ class TransactionNotificationEmailProcessor:
 
     def process_record(self, record):
         bucket = record['s3']['bucket']['name']
-        key = record['s3']['object']['key']
+        key = unquote(record['s3']['object']['key'])
 
-        object_contents = self.get_object(bucket, unquote(key))
+        self.logger.info("Going to get: %s/%s" % (bucket, key))
+
+        object_contents = self.get_object(bucket, key)
         message = email.message_from_string(object_contents)
 
         self.logger.debug("from: %s" % message['from'])
