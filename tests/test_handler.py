@@ -4,7 +4,7 @@ import boto3
 from unittest.mock import MagicMock
 from moto import mock_aws
 from kbank_email_notifications_lambda.parser import Transaction, Recipient, Parser, TransactionFactory
-import kbank_email_notifications_lambda.hello_world as hw
+from kbank_email_notifications_lambda.handler import TransactionNotificationEmailProcessor
 from urllib.parse import unquote
 from datetime import datetime
 import logging
@@ -76,9 +76,6 @@ def test_handler_successful_processing():
     bucket_name = 'my-example-bucket'
     object_key = unquote("some-folder/username%40domain.com/random-hex-characters")
 
-
-
-
     # Create a mock bucket and object
     s3_client.create_bucket(
         Bucket=bucket_name,
@@ -99,7 +96,7 @@ def test_handler_successful_processing():
 
     parser = Parser(TransactionFactory())
 
-    TNP = hw.TransactionNotificationEmailProcessor(
+    TNP = TransactionNotificationEmailProcessor(
         parser,
         sqs_client,
         destination_queue_url,
