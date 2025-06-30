@@ -63,7 +63,8 @@ def test_handler_successful_processing():
             "Recipient Name"
         ),
         0,
-        1_234_567.89
+        1_234_567.89,
+        "whatever"
     )
 
 

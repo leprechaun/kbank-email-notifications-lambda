@@ -22,11 +22,11 @@ class Transaction:
     recipient: Recipient
     fee: float
     balance: float
+    reference: str
 
 
 class TransactionFactory:
     def construct(self, databag):
-        print(databag)
         return Transaction(
             self.get_timestamp(databag),
             self.get_id(databag),
@@ -34,11 +34,15 @@ class TransactionFactory:
             self.get_source(databag),
             self.get_recipient(databag),
             float(databag['Fee (THB)']),
-            float(databag['Available Balance (THB)'].replace(",", ""))
+            float(databag['Available Balance (THB)'].replace(",", "")),
+            self.get_reference(databag)
         )
 
     def get_id(self, databag):
         return databag['Transaction Number']
+
+    def get_reference(self, databag):
+        return databag.get('Transaction No.', '')
 
     def get_first(self, field, databag, methods):
         for method in methods:

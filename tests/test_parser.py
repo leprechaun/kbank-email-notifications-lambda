@@ -17,7 +17,8 @@ class TestTransactionData(unittest.TestCase):
         "Account Name": "Khun Lolen",
         "Amount (THB)": "1,000.00",
         "Fee (THB)": "0.00",
-        "Available Balance (THB)":  "1,234,567.89"
+        "Available Balance (THB)":  "1,234,567.89",
+        "Transaction No.":  "whatever",
     }
 
     factory = TransactionFactory()
@@ -71,6 +72,12 @@ class TestTransactionData(unittest.TestCase):
         self.assertEqual(
             x.bank,
             "BANK OF AYUDHYA"
+        )
+
+    def test_get_reference(self):
+        self.assertEqual(
+            "whatever",
+            self.factory.get_reference(self.databag)
         )
 
     def test_to_account_uses_to_account_first(self):
