@@ -31,7 +31,7 @@ resource "aws_sqs_queue" "incoming_email_notification_queue_dlq" {
 
 resource "aws_lambda_function" "email_notifications_lambda" {
   function_name = "kbank-email-notifications-${terraform.workspace}"
-  handler       = "kbank_email_notifications_lambda.hello_world.handler"
+  handler       = "kbank_email_notifications_lambda.lambda.handler"
   role          = aws_iam_role.lambda_execution_role.arn
   runtime       = "python3.13"
   timeout       = 10
