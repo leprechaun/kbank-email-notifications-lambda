@@ -18,6 +18,7 @@ provider "aws" {
 
 resource "aws_sqs_queue" "parsed_transaction_queue" {
   name = "kbank-parsed-notifications-${terraform.workspace}"
+  message_retention_seconds = 86400 * 14
 }
 
 resource "aws_sqs_queue" "incoming_email_notification_queue" {

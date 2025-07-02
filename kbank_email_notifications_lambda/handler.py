@@ -6,10 +6,8 @@ import json
 from kbank_email_notifications_lambda.parser import Parser, TransactionFactory
 from kbank_email_notifications_lambda.processor import TransactionNotificationEmailProcessor
 
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-
 
 def handler(event, context):
     aws_region = "eu-west-1"
