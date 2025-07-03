@@ -3,7 +3,7 @@ import pytest
 import boto3
 from unittest.mock import MagicMock
 from moto import mock_aws
-from kbank_email_notifications_lambda.parser import Transaction, Recipient, Parser, TransactionFactory
+from kbank_email_notifications_parser.parser import Transaction, Recipient, Parser, TransactionFactory
 from kbank_email_notifications_lambda.handler import TransactionNotificationEmailProcessor
 from urllib.parse import unquote
 from datetime import datetime

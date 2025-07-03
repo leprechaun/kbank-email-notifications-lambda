@@ -366,6 +366,18 @@ files = [
 ]
 
 [[package]]
+name = "kbank-email-notifications-parser"
+version = "0.1.0"
+description = ""
+optional = false
+python-versions = ">=3.11"
+groups = ["main"]
+files = [
+    {file = "kbank_email_notifications_parser-0.1.0-py3-none-any.whl", hash = "sha256:9e9a22f85c203953e8e130fc11919831086727b5f0b518ca1d608ac704a007be"},
+    {file = "kbank_email_notifications_parser-0.1.0.tar.gz", hash = "sha256:49ec7f1b95acd364c50dce132e3de64491755e9a05d50c092895305f96ad87ac"},
+]
+
+[[package]]
 name = "markupsafe"
 version = "3.0.2"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -761,4 +773,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "c2b7f54985cde0fe09038f5360bdd4aefceb66d54497aa48ae045295a835ee4e"
+content-hash = "0b51303ceb74e25bd38bb265833d11c95342a9ffbac879ea58e77f1579f570b3"
