@@ -367,14 +367,14 @@ files = [
 
 [[package]]
 name = "kbank-email-notifications-parser"
-version = "0.1.0"
+version = "0.1.3"
 description = ""
 optional = false
 python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "kbank_email_notifications_parser-0.1.0-py3-none-any.whl", hash = "sha256:9e9a22f85c203953e8e130fc11919831086727b5f0b518ca1d608ac704a007be"},
-    {file = "kbank_email_notifications_parser-0.1.0.tar.gz", hash = "sha256:49ec7f1b95acd364c50dce132e3de64491755e9a05d50c092895305f96ad87ac"},
+    {file = "kbank_email_notifications_parser-0.1.3-py3-none-any.whl", hash = "sha256:397fba409e198a27e0b397dc27bc4a691fc730bf2501f7a66b73b32a9d7a2bfb"},
+    {file = "kbank_email_notifications_parser-0.1.3.tar.gz", hash = "sha256:fe939c310613ab9275ef6aeedfd84c1aab8996056bd2250ffab90bfda87412c6"},
 ]
 
 [[package]]
