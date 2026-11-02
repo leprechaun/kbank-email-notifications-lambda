@@ -14,6 +14,16 @@ locals {
 
 provider "aws" {
   region = "eu-west-1"
+
+  default_tags {
+    tags = {
+      Environment = "shared"
+      ManagedBy   = "terraform"
+      Repository  = "git@github.com:leprechaun/kbank-email-notifications-lambda.git"
+      Project     = "kbank-email-notifications-lambda"
+      Component   = "processor"
+    }
+  }
 }
 
 resource "aws_sqs_queue" "parsed_transaction_queue" {
