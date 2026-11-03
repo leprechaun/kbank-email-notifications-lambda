@@ -80,7 +80,6 @@ jobs:
       working-directory: infra
       run: |
         terraform init
-        terraform workspace select -or-create dev
         terraform apply -auto-approve
 
   deploy-prod:
@@ -104,5 +103,4 @@ jobs:
       working-directory: infra
       run: |
         terraform init
-        terraform workspace select -or-create prod
         terraform apply -auto-approve
