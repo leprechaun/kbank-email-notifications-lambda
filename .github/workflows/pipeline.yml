@@ -64,6 +64,8 @@ jobs:
     environment: dev
     needs:
       - build
+    env:
+      TF_WORKSPACE: dev
     steps:
     - uses: actions/checkout@v3
     - uses: actions/download-artifact@v4
@@ -86,6 +88,8 @@ jobs:
     environment: prod
     needs:
       - deploy-dev
+    env:
+      TF_WORKSPACE: prod
     steps:
     - uses: actions/checkout@v3
     - uses: actions/download-artifact@v4
