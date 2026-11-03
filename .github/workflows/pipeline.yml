@@ -17,7 +17,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
-        python-version: '3.13'
+        python-version: '3.15'
     - name: Install poetry
       run: |
         pip install poetry
@@ -38,7 +38,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
-        python-version: '3.13'
+        python-version: '3.15'
     - name: Install poetry
       run: |
         pip install pip
