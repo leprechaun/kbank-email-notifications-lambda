@@ -1,8 +1,9 @@
 terraform {
   backend "s3" {
-    bucket = "lmacguire-terraform"
-    key    = "kbank-notifications"
-    region = "ap-southeast-1"
+    bucket               = "lmacguire-terraform"
+    key                  = "terraform.tfstate"
+    workspace_key_prefix = "kbank-notifications"
+    region               = "ap-southeast-1"
   }
 }
 
