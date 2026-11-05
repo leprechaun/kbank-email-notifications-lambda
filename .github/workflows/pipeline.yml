@@ -54,7 +54,7 @@ jobs:
       run: |
         ./auto/package
     - name: Upload Package
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: package-artifact
         path: artifact.zip
@@ -68,7 +68,7 @@ jobs:
       TF_WORKSPACE: dev
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v8
       with:
         name: package-artifact
     - uses: aws-actions/configure-aws-credentials@v6.3.0
@@ -91,7 +91,7 @@ jobs:
       TF_WORKSPACE: prod
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v8
       with:
         name: package-artifact
     - uses: aws-actions/configure-aws-credentials@v6.3.0
